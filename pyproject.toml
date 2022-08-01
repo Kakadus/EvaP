@@ -111,3 +111,4 @@ addopts = "--reuse-db"
 profile = "django"
 exclude = "evap/static*"
 preserve_blank_lines = true
+custom_blocks = "cache"
