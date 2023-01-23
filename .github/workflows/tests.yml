@@ -2,8 +2,6 @@ name: EvaP Test Suite
 
 on:
   push:
-    branches:
-      - main
   pull_request:
 
 jobs:
@@ -38,6 +36,9 @@ jobs:
 
       - name: Restore pip download cache
         uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
@@ -79,6 +80,9 @@ jobs:
 
       - name: Restore pip download cache
         uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
@@ -110,6 +114,9 @@ jobs:
 
       - name: Restore pip download cache
         uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
@@ -138,6 +145,9 @@ jobs:
 
       - name: Restore pip download cache
         uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
@@ -167,6 +177,9 @@ jobs:
 
       - name: Restore pip download cache
         uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
@@ -224,6 +237,9 @@ jobs:
 
       - name: Restore pip download cache
         uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
@@ -303,6 +319,9 @@ jobs:
 
       - name: Restore pip download cache
         uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
         run: pip install -r requirements-dev.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
