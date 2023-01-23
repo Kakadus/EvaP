@@ -3,7 +3,6 @@ name: EvaP Test Suite
 on:
   push:
     branches:
-      - main
     pull_request:
 
 jobs:
