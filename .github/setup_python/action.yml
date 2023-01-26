@@ -4,24 +4,18 @@ description: "Sets up Python for use in actions with caching and copy localsetti
 runs:
   using: "composite"
   steps:
-    - name: Setup python
-      uses: actions/setup-python@v4
+    - uses: actions/setup-python@v4
       with:
         python-version: 3.8
 
-    - name: Restore venv cache
-      uses: syphar/restore-virtualenv@v1
+    - uses: syphar/restore-virtualenv@v1
       id: cache-virtualenv
 
-    - name: Restore pip download cache
-      uses: syphar/restore-pip-download-cache@v1
+    - uses: syphar/restore-pip-download-cache@v1
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-
-    - name: Install dependencies
-      run: pip install -r requirements-dev.txt
+    - run: pip install -r requirements-dev.txt
       shell: bash
       if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
-    - name: Add localsettings
-      run: cp evap/settings_test.py evap/localsettings.py
+    - run: cp evap/settings_test.py evap/localsettings.py
       shell: bash

@@ -4,8 +4,7 @@ description: "Sets up nodejs for use in actions with caching"
 runs:
   using: "composite"
   steps:
-    - name: Setup Node
-      uses: actions/setup-node@v3
+    - uses: actions/setup-node@v3
       with:
         cache: npm
 
