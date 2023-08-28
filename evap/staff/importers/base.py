@@ -162,6 +162,17 @@ class ImporterLog:
     def add_success(self, message_text, *, category=ImporterLogEntry.Category.GENERAL):
         return self.add_message(ImporterLogEntry(ImporterLogEntry.Level.SUCCESS, category, message_text))
 
+    def decision_form(self):
+        from evap.staff.forms import UserDecisionForm, DecisionFormEntry
+        form = UserDecisionForm()
+        form.fields["name_mismatches"].choices = (
+            (str(i), DecisionFormEntry(decision.imported, decision.existing))
+            for i, decision in enumerate(
+                self.decisions_by_category().get(ImporterDecisionEntry.Category.NAME, [])
+            )
+        )
+        return form
+
 
 class ImporterException(Exception):
     """Used to abort the import run immediately"""

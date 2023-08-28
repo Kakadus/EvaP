@@ -2137,7 +2137,6 @@ def user_create(request):
 @manager_required
 def user_import(request):
     excel_form = UserImportForm(request.POST or None, request.FILES or None)
-    decision_form = UserDecisionForm()
     import_type = ImportType.USER
 
     importer_log = None
@@ -2154,14 +2153,8 @@ def user_import(request):
                 excel_file = excel_form.cleaned_data["excel_file"]
                 file_content = excel_file.read()
                 __, importer_log = import_users(file_content, test_run=True)
-                decision_form.fields["name_mismatches"].choices = (
-                    (str(i), DecisionFormEntry(decision.imported, decision.existing))
-                    for i, decision in enumerate(
-                        importer_log.decisions_by_category().get(ImporterDecisionEntry.Category.NAME, [])
-                    )
-                )
 
-                if not importer_log.has_errors() and (not importer_log.has_decisions() or operation == "test"):
+                if not importer_log.has_errors() and not importer_log.has_decisions():
                     save_import_file(excel_file, request.user.id, import_type)
 
         elif operation == "import":
@@ -2178,7 +2171,6 @@ def user_import(request):
         "staff_user_import.html",
         {
             "excel_form": excel_form,
-            "decision_form": decision_form,
             "importer_log": importer_log,
             "test_passed": test_passed,
         },

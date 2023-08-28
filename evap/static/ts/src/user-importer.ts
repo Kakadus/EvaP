@@ -1,14 +1,14 @@
 import { selectOrError } from "./utils.js";
 import { CSRF_HEADERS } from "./csrf-utils.js";
 
-export function attachFormSubmitDownloadAndRedirect(form_id: string, filename: string, redirectUrl: string) {
-    let form: HTMLFormElement = selectOrError("#" + form_id);
-    let formData = new FormData(form);
+export function attachFormSubmitDownloadAndRedirect(form_id: string, filename: string, redirectUrl: string): void {
+    const form: HTMLFormElement = selectOrError("#" + form_id);
+    const formData = new FormData(form);
     form.onsubmit = _ => {
         fetch(form.action, {
-            method: form.method,
-            headers: CSRF_HEADERS,
             body: formData,
+            headers: CSRF_HEADERS,
+            method: form.method,
         })
             .then(resp => resp.blob())
             .then(blob => {
