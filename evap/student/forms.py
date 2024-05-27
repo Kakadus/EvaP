@@ -1,6 +1,7 @@
 from django import forms
+from typing_extensions import assert_never
 
-from evap.evaluation.models import CHOICES, Question
+from evap.evaluation.models import CHOICES, Question, Questionnaire
 from evap.student.tools import answer_field_id
 
 
@@ -71,7 +72,7 @@ class QuestionnaireVotingForm(forms.Form):
 
     See http://jacobian.org/writing/dynamic-form-generation/"""
 
-    def __init__(self, *args, contribution, questionnaire, **kwargs):
+    def __init__(self, *args, contribution, questionnaire: Questionnaire, **kwargs):
         super().__init__(*args, **kwargs)
         self.questionnaire = questionnaire
 
@@ -82,6 +83,8 @@ class QuestionnaireVotingForm(forms.Form):
                 field = RatingAnswerField.from_question(question)
             elif question.is_heading_question:
                 field = HeadingField.from_question(question)
+            else:
+                assert_never(question.type)  # type: ignore[arg-type]
 
             identifier = answer_field_id(contribution, questionnaire, question)
             self.fields[identifier] = field

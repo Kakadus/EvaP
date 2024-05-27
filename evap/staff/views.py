@@ -4,7 +4,7 @@ from collections import OrderedDict, defaultdict, namedtuple
 from collections.abc import Container
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Any, cast
+from typing import Any, Literal, cast, get_args
 
 import openpyxl
 from django.conf import settings
@@ -37,6 +37,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy, ngettext
 from django.views.decorators.http import require_POST
 from django.views.generic import CreateView, FormView, UpdateView
+from typing_extensions import assert_never
 
 from evap.contributor.views import export_contributor_results
 from evap.evaluation.auth import manager_required, reviewer_required, staff_permission_required
@@ -1386,7 +1387,21 @@ def evaluation_email(request, evaluation_id):
     )
 
 
-def helper_delete_users_from_evaluation(evaluation, operation):
+EvaluationPersonManagementOperation = Literal[
+    "test-participants",
+    "import-participants",
+    "copy-participants",
+    "import-replace-participants",
+    "copy-replace-participants",
+    "test-contributors",
+    "import-contributors",
+    "copy-contributors",
+    "import-replace-contributors",
+    "copy-replace-contributors",
+]
+
+
+def helper_delete_users_from_evaluation(evaluation: Evaluation, operation: Literal[EvaluationPersonManagementOperation]) -> tuple[int, str]:
     if "participants" in operation:
         deleted_person_count = evaluation.participants.count()
         deletion_message = _("{} participants were deleted from evaluation {}")
@@ -1395,13 +1410,15 @@ def helper_delete_users_from_evaluation(evaluation, operation):
         deleted_person_count = evaluation.contributions.exclude(contributor=None).count()
         deletion_message = _("{} contributors were deleted from evaluation {}")
         evaluation.contributions.exclude(contributor=None).delete()
+    else:
+        assert_never(operation)  # type: ignore[arg-type]
 
     return deleted_person_count, deletion_message
 
 
 @manager_required
 @transaction.atomic
-def evaluation_person_management(request, evaluation_id):
+def evaluation_person_management(request: HttpRequest, evaluation_id: int) -> HttpResponse:
     # This view indeed handles 4 tasks. However, they are tightly coupled, splitting them up
     # would lead to more code duplication. Thus, we decided to leave it as is for now
     # pylint: disable=too-many-locals
@@ -1418,21 +1435,10 @@ def evaluation_person_management(request, evaluation_id):
     importer_log = None
 
     if request.method == "POST":
-        operation = request.POST.get("operation")
-        if operation not in (
-            "test-participants",
-            "import-participants",
-            "copy-participants",
-            "import-replace-participants",
-            "copy-replace-participants",
-            "test-contributors",
-            "import-contributors",
-            "copy-contributors",
-            "import-replace-contributors",
-            "copy-replace-contributors",
-        ):
+        op = request.POST.get("operation")
+        if op not in get_args(EvaluationPersonManagementOperation):
             raise SuspiciousOperation("Invalid POST operation")
-
+        operation = cast(EvaluationPersonManagementOperation, op)
         import_type = ImportType.PARTICIPANT if "participants" in operation else ImportType.CONTRIBUTOR
         excel_form = participant_excel_form if "participants" in operation else contributor_excel_form
         copy_form = participant_copy_form if "participants" in operation else contributor_copy_form
@@ -1466,6 +1472,8 @@ def evaluation_person_management(request, evaluation_id):
                     importer_log = import_persons_from_evaluation(
                         import_type, evaluation, test_run=False, source_evaluation=import_evaluation
                     )
+            else:
+                assert_never(operation)  # type: ignore[arg-type]
 
             if "replace" in operation:
                 importer_log.add_success(

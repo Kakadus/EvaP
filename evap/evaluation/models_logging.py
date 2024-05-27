@@ -15,6 +15,7 @@ from django.forms.models import model_to_dict
 from django.template.defaultfilters import yesno
 from django.utils.formats import localize
 from django.utils.translation import gettext_lazy as _
+from typing_extensions import assert_never
 
 from evap.evaluation.tools import capitalize_first
 
@@ -102,22 +103,28 @@ class LogEntry(models.Model):
         }
 
     @property
-    def message(self):
-        if self.action_type == InstanceActionType.CHANGE:
+    def message(self) -> str:
+        action_type = InstanceActionType(self.action_type)
+        if action_type == InstanceActionType.CHANGE:
             if self.content_object:
                 message = _("The {cls} {obj} was changed.")
             else:  # content_object might be deleted
                 message = _("A {cls} was changed.")
-        elif self.action_type == InstanceActionType.CREATE:
+        elif action_type == InstanceActionType.CREATE:
             if self.content_object:
                 message = _("The {cls} {obj} was created.")
             else:
                 message = _("A {cls} was created.")
-        elif self.action_type == InstanceActionType.DELETE:
+        elif action_type == InstanceActionType.DELETE:
             message = _("A {cls} was deleted.")
-
+        else:
+            assert_never(action_type)
+        model_class = self.content_type.model_class()
+        assert model_class
+        verbose_name = model_class._meta.verbose_name
+        assert verbose_name
         return message.format(
-            cls=capitalize_first(self.content_type.model_class()._meta.verbose_name),
+            cls=capitalize_first(verbose_name),
             obj=f'"{str(self.content_object)}"' if self.content_object else "",
         )
 
