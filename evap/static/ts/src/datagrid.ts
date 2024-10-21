@@ -260,7 +260,7 @@ export class TableGrid extends DataGrid {
         return [...row.children] as HTMLElement[];
     }
 
-    protected fetchRowFilterValues(row: HTMLElement): Map<string, string[]> {
+    protected fetchRowFilterValues(_row: HTMLElement): Map<string, string[]> {
         return new Map();
     }
 

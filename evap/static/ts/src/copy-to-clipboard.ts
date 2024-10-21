@@ -1,4 +1,4 @@
-function copyToClipboard(text: string) {
+export function copyToClipboard(text: string) {
     const selection = document.getSelection()!;
     const el = document.createElement("textarea");
     el.value = text;
@@ -14,6 +14,6 @@ function copyToClipboard(text: string) {
     }
 }
 
-function copyHeaders(headers: string[]) {
+export function copyHeaders(headers: string[]) {
     copyToClipboard(headers.join("\t"));
 }

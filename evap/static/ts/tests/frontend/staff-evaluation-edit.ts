@@ -1,5 +1,4 @@
 import { test, expect } from "@jest/globals";
-import { ElementHandle } from "puppeteer";
 
 import { pageHandler } from "../utils/page";
 import { assertDefined } from "../../src/utils";

@@ -37,7 +37,7 @@ export default tseslint.config(
             "@typescript-eslint/no-unnecessary-type-parameters": "off",
             // fixed in this PR
             "@typescript-eslint/no-unused-vars": [
-                "warn",
+                "error",
                 {
                     args: "all",
                     argsIgnorePattern: "^_",
