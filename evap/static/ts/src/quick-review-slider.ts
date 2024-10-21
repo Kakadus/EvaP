@@ -323,7 +323,7 @@ export class QuickReviewSlider {
         this.slider.querySelector<HTMLElement>(".btn:focus")?.blur();
     };
     private updateNextEvaluation = () => {
-        let foundNext = false;
+        let foundNext: boolean | undefined;
         document.querySelectorAll<HTMLElement>("[data-next-evaluation-index]").forEach(element => {
             const isNext = saneParseInt(element.dataset.nextEvaluationIndex!) === this.nextEvaluationIndex;
             element.classList.toggle("d-none", !isNext);
