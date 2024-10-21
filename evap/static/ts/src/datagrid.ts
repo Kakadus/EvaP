@@ -191,7 +191,11 @@ abstract class DataGrid {
 
     // Reflects changes to the rows to the DOM
     protected renderToDOM() {
-        [...this.container.children].map(element => element as HTMLElement).forEach(element => element.remove());
+        [...this.container.children]
+            .map(element => element as HTMLElement)
+            .forEach(element => {
+                element.remove();
+            });
         const elements = this.rows.filter(row => row.isDisplayed).map(row => row.element);
         this.container.append(...elements);
         this.saveStateToStorage();
@@ -294,7 +298,9 @@ export class EvaluationGrid extends TableGrid {
                     button.classList.remove("active");
                     this.state.equalityFilter.delete("evaluationState");
                 } else {
-                    this.filterButtons.forEach(button => button.classList.remove("active"));
+                    this.filterButtons.forEach(button => {
+                        button.classList.remove("active");
+                    });
                     button.classList.add("active");
                     this.state.equalityFilter.set("evaluationState", [button.dataset.filter!]);
                 }
@@ -439,8 +445,14 @@ export class ResultGrid extends DataGrid {
             };
         }
 
-        this.sortColumnSelect.addEventListener("change", () => this.sortByInputs());
-        this.sortOrderCheckboxes.forEach(checkbox => checkbox.addEventListener("change", () => this.sortByInputs()));
+        this.sortColumnSelect.addEventListener("change", () => {
+            this.sortByInputs();
+        });
+        this.sortOrderCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", () => {
+                this.sortByInputs();
+            });
+        });
 
         this.resetFilter.addEventListener("click", () => {
             this.state.search = "";

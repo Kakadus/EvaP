@@ -130,11 +130,15 @@ export class QuickReviewSlider {
         });
         document.addEventListener("keydown", this.keydownHandler);
         this.skipEvaluationButton?.addEventListener("click", this.skipEvaluationHandler);
-        this.sliderItems.forEach(item => item.addEventListener("transitionend", this.transitionHandler(item)));
-        this.slideTriggers.forEach(trigger => trigger.addEventListener("click", this.slideHandler(trigger)));
-        Object.values(this.startOverTriggers).forEach(trigger =>
-            trigger.addEventListener("click", this.startOverHandler(trigger)),
-        );
+        this.sliderItems.forEach(item => {
+            item.addEventListener("transitionend", this.transitionHandler(item));
+        });
+        this.slideTriggers.forEach(trigger => {
+            trigger.addEventListener("click", this.slideHandler(trigger));
+        });
+        Object.values(this.startOverTriggers).forEach(trigger => {
+            trigger.addEventListener("click", this.startOverHandler(trigger));
+        });
 
         this.startOver(StartOverWhere.Undecided);
         this.updateNextEvaluation();
@@ -447,7 +451,9 @@ export class QuickReviewSlider {
             // because the element has zero opacity until we add `.active`.
             nextActiveElement.classList.remove("to-left", "to-right");
             nextActiveElement.classList.add(`to-${direction}`);
-            requestAnimationFrame(() => nextActiveElement.classList.add("active"));
+            requestAnimationFrame(() => {
+                nextActiveElement.classList.add("active");
+            });
         }
     };
 }

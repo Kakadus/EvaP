@@ -40,7 +40,9 @@ export class ConfirmationModal extends HTMLElement {
         this.dialogForm = selectOrError("form[method=dialog]", this.dialog);
         this.dialogForm.addEventListener("submit", this.onDialogFormSubmit);
 
-        this.dialog.addEventListener("click", event => event.stopPropagation());
+        this.dialog.addEventListener("click", event => {
+            event.stopPropagation();
+        });
     }
 
     onDialogFormSubmit = (event: SubmitEvent) => {

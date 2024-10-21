@@ -29,7 +29,9 @@ const makeCustomSuccessForm = (form: HTMLFormElement) => {
 };
 
 const makeReloadOnSuccessForm = (form: HTMLFormElement) => {
-    overrideSuccessfulSubmit(form, () => window.location.reload());
+    overrideSuccessfulSubmit(form, () => {
+        window.location.reload();
+    });
 };
 
 export const setupForms = () => {

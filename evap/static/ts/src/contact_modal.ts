@@ -60,10 +60,10 @@ export class ContactModalLogic {
             this.actionButtonElement.disabled = false;
         });
 
-        this.showButtonElements.forEach(button =>
+        this.showButtonElements.forEach(button => {
             button.addEventListener("click", () => {
                 this.modal.show();
-            }),
-        );
+            });
+        });
     };
 }

@@ -40,7 +40,9 @@ export function initTextAnswerWarnings(textareas: NodeListOf<HTMLTextAreaElement
         let warningDelayTimer: ReturnType<typeof setTimeout>;
         textarea.addEventListener("input", () => {
             clearTimeout(warningDelayTimer);
-            warningDelayTimer = setTimeout(() => updateTextareaWarning(textarea, textAnswerWarnings), 300);
+            warningDelayTimer = setTimeout(() => {
+                updateTextareaWarning(textarea, textAnswerWarnings);
+            }, 300);
         });
         textarea.addEventListener("blur", () => {
             updateTextareaWarning(textarea, textAnswerWarnings);
