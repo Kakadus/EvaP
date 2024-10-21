@@ -48,7 +48,6 @@ export default tseslint.config(
                     ignoreRestSiblings: true,
                 },
             ],
-            "@typescript-eslint/no-redundant-type-constituents": "warn",
         },
     },
 );
