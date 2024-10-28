@@ -8,12 +8,14 @@ test(
     "changes form data",
     pageHandler("/staff/semester/PK/evaluation/PK/edit/normal.html", async page => {
         const managerId = await page.evaluate(() => {
+            /* eslint-disable @typescript-eslint/no-unsafe-assignment */
             const tomselect = (document.getElementById("id_contributions-0-contributor") as any).tomselect;
             const options = tomselect.options;
             const managerOption = Object.keys(options).find(
                 key => options[key].text == "manager (manager@institution.example.com)",
             );
             tomselect.setValue(managerOption);
+            /* eslint-enable @typescript-eslint/no-unsafe-assignment */
             return managerOption;
         });
         assertDefined(managerId);

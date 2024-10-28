@@ -202,12 +202,15 @@ abstract class DataGrid {
     }
 
     private restoreStateFromStorage(): State {
-        const stored = JSON.parse(localStorage.getItem(this.storageKey)!) || {};
+        const stored = localStorage.getItem(this.storageKey);
+        if (stored) {
+            return JSON.parse(stored) as State;
+        }
         return {
-            equalityFilter: new Map(stored.equalityFilter),
-            rangeFilter: new Map(stored.rangeFilter),
-            search: stored.search || "",
-            order: stored.order || this.defaultOrder,
+            equalityFilter: new Map(),
+            rangeFilter: new Map(),
+            search: "",
+            order: this.defaultOrder,
         };
     }
 

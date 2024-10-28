@@ -35,7 +35,7 @@ async function createElementMessage(
         const optionallyNot = this.isNot ? "not " : "";
         const receivedLine = value ? `\nReceived: ${this.utils.printReceived(value)}` : "";
         return (
-            this.utils.matcherHint(matcherName, undefined, undefined, { isNot: this.isNot }) +
+            this.utils.matcherHint(matcherName, undefined, undefined, { isNot: this.isNot as boolean | undefined }) +
             "\n\n" +
             `Expected ${this.utils.RECEIVED_COLOR(tagDescription)} to ${optionallyNot}${expectation}` +
             receivedLine
