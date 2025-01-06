@@ -27,7 +27,7 @@ DEBUG = True
 
 # Very helpful but eats a lot of performance on sql-heavy pages.
 # Works only with DEBUG = True and Django's development server (so no apache).
-ENABLE_DEBUG_TOOLBAR = False
+ENABLE_DEBUG_TOOLBAR = True
 
 ### EvaP logic
 
