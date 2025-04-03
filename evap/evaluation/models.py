@@ -1626,7 +1626,7 @@ class NotHalfEmptyConstraint(CheckConstraint):
         assert "condition" not in kwargs
 
         super().__init__(
-            condition=Q(**{field: "" for field in fields}) | ~Q(**{field: "" for field in fields}, _connector=Q.OR),
+            condition=Q(**dict.fromkeys(fields, "")) | ~Q(**dict.fromkeys(fields, ""), _connector=Q.OR),
             name=name,
             **kwargs,
         )

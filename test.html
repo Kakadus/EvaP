@@ -1,0 +1,784 @@
+<html lang="en">
+    <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+            <title>EvaP</title>
+            <link rel="stylesheet" href="/static/css/tom-select.bootstrap5.min.css" />
+            <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css" />
+            <link rel="stylesheet" href="/static/css/evap.css" />
+                <link rel="icon" type="image/png" sizes="64x64" href="/static/images/favicon_64.png" />
+                <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon_32.png" />
+                <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon_16.png" />
+    </head>
+    <body>
+        <script type="text/javascript" src="/static/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<template id="confirmation-modal-template">
+    <link rel="stylesheet" href="/static/css/evap.css" />
+    <dialog class="evap-modal-dialog">
+        <form method="dialog">
+            <div class="evap-modal-container">
+                <header>
+                    <h5 class="mb-0"><slot name="title"></slot></h5>
+                    <button class="btn-close"></button>
+                </header>
+                <section class="question-area">
+                    <slot name="question"></slot>
+                    <slot name="extra-inputs"></slot>
+                </section>
+                <section class="button-area">
+                    <button class="btn btn-light" autofocus>Cancel</button>
+                    <slot name="submit-group">
+                        <button class="btn ms-2" data-event-type="confirm">
+                            <slot name="action-text"></slot>
+                        </button>
+                    </slot>
+                </section>
+            </div>
+        </form>
+    </dialog>
+    <slot name="show-button"></slot>
+    <slot></slot>
+</template>
+<script type="module">
+    import { ConfirmationModal } from "/static/js/confirmation-modal.js";
+    customElements.define("confirmation-modal", ConfirmationModal);
+</script>
+    <div class="modal fade" id="loginProblemsModal" tabindex="-1" role="dialog" aria-labelledby="loginProblemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginProblemsModalLabel">Login problems</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                You should have received an evaluation invitation via email that included a URL to login on this platform. You can also request a new login URL on this page. If you encounter any problems with your login, please let us know by answering to the evaluation email you received.
+                <div class="modal-submit-group">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        <div class="sticky-top d-print-none z-over-fixed">
+<nav class="navbar bg-debug navbar-expand-lg ps-0">
+    <a class="d-block
+            d-lg-none
+        "
+        href="/"><img class="brand-image" src="/static/images/evap.png" alt=""/></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="fas fa-bars fa-fw"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-between" id="navbarNavDropdown">
+        <span class="d-none d-lg-block navbar-nav justify-content-start">
+            <a href="/"><img class="brand-image" src="/static/images/evap.png" alt=""/></a>
+        </span>
+        <ul class="navbar-nav justify-content-center">
+        </ul>
+        <ul class="navbar-nav justify-content-end">
+            <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
+            <li class="nav-item btn-switch-navbar my-auto ps-2 pb-3 pb-lg-0">
+                <div class="btn-group">
+                        <form class="d-flex" method="post" action="/set_lang">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="eM6dD5TOBqKLN2Q4oUvRiBCJSyaSznPbkQm53klbkYBdWlWSXdQxX8dQEqpBXNJd">
+                            <input name="language" type="hidden" value="en">
+                            <button data-bs-toggle="tooltip" data-bs-placement="bottom" data-set-spinner-icon="span-set-language-en" title="English" type="submit"
+                                class="btn btn-sm active">
+                                <span id="span-set-language-en">EN</span>
+                            </button>
+                        </form>
+                        <form class="d-flex" method="post" action="/set_lang">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="eM6dD5TOBqKLN2Q4oUvRiBCJSyaSznPbkQm53klbkYBdWlWSXdQxX8dQEqpBXNJd">
+                            <input name="language" type="hidden" value="de">
+                            <button data-bs-toggle="tooltip" data-bs-placement="bottom" data-set-spinner-icon="span-set-language-de" title="Deutsch" type="submit"
+                                class="btn btn-sm">
+                                <span id="span-set-language-de">DE</span>
+                            </button>
+                        </form>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+        </div>
+        <img class="print-brand-image d-none d-print-block" src="/static/images/evap.png" alt="Evaluation Platform" />
+        <div class="p-3 mb-4" id="evapContent">
+            <div class="container">
+    <div class="jumbotron-evap">
+        <h1 class="display-4">Welcome to the evaluation platform!</h1>
+        <hr class="my-4" />
+        <div class="card-deck-login">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h4 class="card-title text-primary">
+                        HPI login
+                    </h4>
+                        <p class="card-text">
+                            Log in using email and password.
+                        </p>
+                        <form id="email-login-form" class="d-flex flex-column" role="form"
+                            action="/?next=/contributor/evaluation/32/edit" method="POST">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="eM6dD5TOBqKLN2Q4oUvRiBCJSyaSznPbkQm53klbkYBdWlWSXdQxX8dQEqpBXNJd">
+                            <input type="hidden" name="submit_type" value="login_email" />
+    <div class="mb-3 d-md-flex">
+            <label class="col-md-5 pe-4 form-label" for="id_email">
+    Email
+</label>
+            <div class="col-md-7">
+    <input class="form-control" type="email" name="email" autofocus maxlength="254" required id="id_email" />
+</div>
+    </div>
+    <div class="mb-3 d-md-flex">
+            <label class="col-md-5 pe-4 form-label" for="id_password">
+    Password
+</label>
+            <div class="col-md-7">
+    <input class="form-control" type="password" name="password" required id="id_password" />
+</div>
+    </div>
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary login-button">Login</button>
+                            </div>
+                        </form>
+                </div>
+            </div>
+            <div class="card border-dark">
+                <form id="request-login-form" class="card-body d-flex flex-column"
+                    action="/?next=/contributor/evaluation/32/edit" method="POST">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="eM6dD5TOBqKLN2Q4oUvRiBCJSyaSznPbkQm53klbkYBdWlWSXdQxX8dQEqpBXNJd">
+                    <input type="hidden" name="submit_type" value="new_key" />
+                    <h4 class="card-title text-dark">
+                        D-School, E-School and externals
+                    </h4>
+                    <p class="card-text mb-lg-auto">
+                        Here you can request a one-time login URL. We will send it to your email address.
+                    </p>
+    <div class="mb-3 d-md-flex">
+            <label class="col-md-5 pe-4 form-label" for="id_email">
+    Email address
+</label>
+            <div class="col-md-7">
+    <input class="form-control" type="email" name="email" maxlength="320" required id="id_email" />
+</div>
+    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-dark login-button">Request login URL</button>
+                        <button type="button" class="btn btn-light ms-1" data-bs-toggle="modal" data-bs-target="#loginProblemsModal">
+                            Help
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+            </div>
+        </div>
+        <div class="footer d-print-none">
+    <div class="color-bar">
+        <div class="vote-bg-green width-percent-52"></div>
+        <div class="vote-bg-lime width-percent-26"></div>
+        <div class="vote-bg-yellow width-percent-13"></div>
+        <div class="vote-bg-orange width-percent-6"></div>
+        <div class="vote-bg-red width-percent-3"></div>
+    </div>
+    <nav class="navbar navbar-expand">
+        <div class="collapse navbar-collapse justify-content-between">
+            <ul class="navbar-nav justify-content-start">
+                <li class="nav-item my-auto">
+                    <a class="nav-link nav-link-multiline" href="/legal_notice">Legal Notice<br />Data Privacy</a>
+                </li>
+                <li class="d-none d-sm-block nav-item">
+                    <a class="nav-link" href="https://github.com/e-valuation/EvaP" target="_blank"><span class="fas fa-arrow-up-right-from-square"></span> GitHub project</a>
+                </li>
+            </ul>
+            <div class="d-none d-lg-block navbar-nav justify-content-center text-center">
+                <span class="fst-italic">Elegant valiantly administered platform</span>
+            </div>
+            <div class="navbar-nav justify-content-end feedback-button-placeholder">
+            </div>
+        </div>
+    </nav>
+</div>
+        <script src="/catalog.js"></script>
+        <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
+        <script type="text/javascript" src="/static/js/tom-select.complete.min.js"></script>
+        <script type="text/javascript" src="/static/js/plugins/jquery.formset.js"></script>
+        <script type="text/javascript" src="/static/js/Sortable.min.js"></script>
+        <script type="module" src="/static/js/csrf-utils.js"></script>
+        <script type="module" src="/static/js/utils.js"></script>
+        <script type="module" src="/static/js/base-template.js"></script>
+        <script type="text/javascript">
+            activateTooltips = function(selector = "") {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll(selector + \' [data-bs-toggle="tooltip"]\'))
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    var container = \'body\';
+                    if (tooltipTriggerEl.dataset.container){
+                        container = tooltipTriggerEl.closest(tooltipTriggerEl.dataset.container);
+                    }
+                    return new bootstrap.Tooltip(tooltipTriggerEl, {container: container, html: true, trigger: \'hover\'})
+                })
+            };
+            activateTooltips();
+            // These are workarounds around incompatibilities of django, django-dynamic-formsets, and tomselect.
+            // tomselect can\'t handle already tomselect\'d forms that were copies made by django-dynamic-formsets\'
+            // "add another" button, so we take a copy of a non-tomselect\'d form here
+            const tomSelectRows = document.querySelectorAll(".tomselecttr");
+            if(tomSelectRows.length != 0) {
+                const templateForm = tomSelectRows[tomSelectRows.length - 1].cloneNode(true);
+                // later we use this class to give this to django-dynamic-formsets as template and to make sure it does not get tomselect\'d
+                templateForm.classList.add("form-template");
+                templateForm.style.display = "none";
+                // django-dynamic-formsets doesn\'t hide the "delete this row" input in the clone since it\'s not part of the formset.
+                templateForm.querySelectorAll("input[id$=-DELETE]").forEach(input => {input.type = "hidden";});
+                // For some reason, django validates this template if it\'s part of the form, so we insert the copy outside of the form.
+                document.querySelector(".tomselectform").insertAdjacentElement("afterend", templateForm);
+            }
+            // used in derived templates. Tag inputs are multi-inputs where users can add options
+            const tagTomSelectOptions = {
+                create: true,
+                createOnBlur: true,
+                delimiter: \'\', // we don\'t want the default "comma creates entry" behavior
+                dropdownParent: document.createElement("div"),  // To make it invisible
+                // On enter, with hidden dropdown, always add current text. Otherwise, adding a
+                // prefix of an existing item doesn\'t work
+                addPrecedence: true,
+            };
+            class MinimumInputLengthTomSelect extends TomSelect {
+                constructor(...args) {
+                    super(...args);
+                    this.settings.shouldLoad = () => true;  // Otherwise, for empty inputs, no dropdown would be shown.
+                }
+                // hacky solution, comes from
+                // https://github.com/orchidjs/tom-select/discussions/376
+                // ( via https://stackoverflow.com/questions/72233401/ )
+                search(query) {
+                    if(query.length < this.settings.minimumInputLength) {
+                        return this.sifter.prepareSearch(query, {});
+                    }
+                    return super.search(query);
+                }
+            }
+            applyTomSelect = function(elements, additionalOptions = {}) {
+                elements.forEach((element) => {
+                    const minimumInputLength = element.options.length >= 50 ? 3 : 0;
+                    element.tomselect?.destroy();
+                    element.classList.remove("form-select");  // TomSelect applies their own matching classes / styles
+                    if(element.parentElement.classList.contains("is-invalid")) {  // hotfix for our wrongly placed is-invalid
+                        element.parentElement.classList.remove("is-invalid");
+                        element.classList.add("is-invalid");
+                    }
+                    const baseOptions = {
+                        createOnBlur: true,
+                        placeholder: "Please select...",
+                        hidePlaceholder: element.hasAttribute("data-tomselect-fullwidth") ? false : true,
+                        minimumInputLength,
+                        render: {
+                            option_create: (data, escape) => `<div class="create">${ escape(data.input) }</div>`,
+                            no_results: (data, escape) => {
+                                if(data.input.length < minimumInputLength) {
+                                    return `<div class="no-results">Please enter ${ minimumInputLength } characters or more...</div>`;
+                                } else {
+                                    return \'<div class="no-results">No results found</div>\';
+                                }
+                            }
+                        },
+                        closeAfterSelect: true, // also clears search input on enter.
+                        plugins: {},
+                        hideSelected: false,
+                    };
+                    if (element.hasAttribute("tomselect-no-sort")) {
+                        baseOptions.sortField = [{field:\'$order\'},{field:\'$score\'}];
+                    }
+                    if(element.hasAttribute("data-tomselect-fullwidth")) {
+                        // span needed to the "remove this icon" button is right-aligned
+                        baseOptions.render.item = (data, escape) => `<div class="w-100"><span class="w-100">${ escape(data.text) }</span></div>`;
+                    }
+                    if(element.multiple) {
+                        baseOptions.plugins.clear_button = {"title": "Remove all items"};
+                        baseOptions.plugins.remove_button = {"title": "Remove this item"};
+                    }
+                    new MinimumInputLengthTomSelect(element, Object.assign({}, baseOptions, additionalOptions));
+                });
+            };
+            applyTomSelect(document.querySelectorAll("select:not(.form-template select):not(.no-tomselect)"));
+            document.addEventListener(\'change\', e => e.target.classList.remove("invalid"), true);
+            // activate clickable hover tables
+            document.querySelectorAll(".table-seamless-links [data-url]").forEach(row => {
+                row.addEventListener("click", event => {
+                    // We navigate via the <a> tag to enable browser behavior for Ctrl-Click. We cannot insert an actual
+                    // <a> tag, because there cannot be any non-table tags between for example <tbody> and <tr>.
+                    const anchor = document.createElement("a");
+                    anchor.href = row.dataset.url;
+                    // As `event` is bound to `row`, we need to clone it.
+                    anchor.dispatchEvent(new event.constructor(event.type, event));
+                });
+            });
+            document.querySelectorAll(".hover-row").forEach(row => {
+                row.querySelectorAll(".btn:not(.btn-row-hover)").forEach(button => {
+                    button.addEventListener("mouseover", () => row.classList.remove("hover-row"));
+                    button.addEventListener("mouseout", () => row.classList.add("hover-row"));
+                });
+            });
+            function setSpinnerIcon(id) {
+                const element = document.getElementById(id);
+                element.innerHTML = "";
+                element.className = "fas fa-spinner fa-spin";  // clears all other classes
+            };
+            document.querySelectorAll("[data-set-spinner-icon]").forEach(el => {
+                el.addEventListener("click", () => setSpinnerIcon(el.dataset.setSpinnerIcon));
+            });
+        </script>
+        <script type="module">
+            import { setupForms } from "/static/js/custom-success-form.js";
+            setupForms();
+        </script>
+    </body>
+</html>'
+(Pdb) p self.app.post(f"/contributor/evaluation/{evaluation.pk}/edit", params=data, user=user1).follow().text
+'<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+            <title>EvaP</title>
+
+            <link rel="stylesheet" href="/static/css/tom-select.bootstrap5.min.css" />
+            <link rel="stylesheet" href="/static/css/bootstrap-datetimepicker.min.css" />
+            <link rel="stylesheet" href="/static/css/evap.css" />
+            
+                <link rel="icon" type="image/png" sizes="64x64" href="/static/images/favicon_64.png" />
+                <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon_32.png" />
+                <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon_16.png" />
+            
+        
+    </head>
+    <body>
+        <script type="text/javascript" src="/static/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+        
+
+
+
+<template id="confirmation-modal-template">
+    <link rel="stylesheet" href="/static/css/evap.css" />
+
+    <dialog class="evap-modal-dialog">
+        <form method="dialog">
+            <div class="evap-modal-container">
+                <header>
+                    <h5 class="mb-0"><slot name="title"></slot></h5>
+                    <button class="btn-close"></button>
+                </header>
+                <section class="question-area">
+                    <slot name="question"></slot>
+                    <slot name="extra-inputs"></slot>
+                </section>
+                <section class="button-area">
+                    <button class="btn btn-light" autofocus>Cancel</button>
+                    <slot name="submit-group">
+                        <button class="btn ms-2" data-event-type="confirm">
+                            <slot name="action-text"></slot>
+                        </button>
+                    </slot>
+                </section>
+            </div>
+        </form>
+    </dialog>
+
+    <slot name="show-button"></slot>
+
+    
+    <slot></slot>
+</template>
+
+
+<script type="module">
+    import { ConfirmationModal } from "/static/js/confirmation-modal.js";
+
+    customElements.define("confirmation-modal", ConfirmationModal);
+</script>
+
+
+        
+    
+            
+        
+    <div class="modal fade" id="loginProblemsModal" tabindex="-1" role="dialog" aria-labelledby="loginProblemsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginProblemsModalLabel">Login problems</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                You should have received an evaluation invitation via email that included a URL to login on this platform. You can also request a new login URL on this page. If you encounter any problems with your login, please let us know by answering to the evaluation email you received.
+                <div class="modal-submit-group">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        <div class="sticky-top d-print-none z-over-fixed">
+            
+
+
+<nav class="navbar bg-debug navbar-expand-lg ps-0">
+    <a class="d-block
+        
+            d-lg-none
+        "
+        href="/"><img class="brand-image" src="/static/images/evap.png" alt=""/></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="fas fa-bars fa-fw"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-between" id="navbarNavDropdown">
+        <span class="d-none d-lg-block navbar-nav justify-content-start">
+            <a href="/"><img class="brand-image" src="/static/images/evap.png" alt=""/></a>
+        </span>
+        <ul class="navbar-nav justify-content-center">
+            
+        </ul>
+        <ul class="navbar-nav justify-content-end">
+            <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
+            <li class="nav-item btn-switch-navbar my-auto ps-2 pb-3 pb-lg-0">
+                <div class="btn-group">
+                    
+                        <form class="d-flex" method="post" action="/set_lang">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="ouMFQdhSNIyRGQMtWKR6IQAkJpNs4rz5uy2xgsJfwgpjP9Shv3cMnnbrvh2bsRt7">
+                            <input name="language" type="hidden" value="en">
+                            <button data-bs-toggle="tooltip" data-bs-placement="bottom" data-set-spinner-icon="span-set-language-en" title="English" type="submit"
+                                class="btn btn-sm active">
+                                <span id="span-set-language-en">EN</span>
+                            </button>
+                        </form>
+                    
+                        <form class="d-flex" method="post" action="/set_lang">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="ouMFQdhSNIyRGQMtWKR6IQAkJpNs4rz5uy2xgsJfwgpjP9Shv3cMnnbrvh2bsRt7">
+                            <input name="language" type="hidden" value="de">
+                            <button data-bs-toggle="tooltip" data-bs-placement="bottom" data-set-spinner-icon="span-set-language-de" title="Deutsch" type="submit"
+                                class="btn btn-sm">
+                                <span id="span-set-language-de">DE</span>
+                            </button>
+                        </form>
+                    
+                </div>
+            </li>
+            
+        </ul>
+    </div>
+</nav>
+
+
+            
+            
+        </div>
+
+        <img class="print-brand-image d-none d-print-block" src="/static/images/evap.png" alt="Evaluation Platform" />
+
+        
+
+        <div class="p-3 mb-4" id="evapContent">
+            <div class="container">
+                
+
+                
+    
+                
+
+    <div class="jumbotron-evap">
+        <h1 class="display-4">Welcome to the evaluation platform!</h1>
+        <hr class="my-4" />
+        <div class="card-deck-login">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h4 class="card-title text-primary">
+                        HPI login
+                    </h4>
+                    
+                        <p class="card-text">
+                            Log in using email and password.
+                        </p>
+                        <form id="email-login-form" class="d-flex flex-column" role="form"
+                            action="/?next=/contributor/evaluation/32/edit" method="POST">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="ouMFQdhSNIyRGQMtWKR6IQAkJpNs4rz5uy2xgsJfwgpjP9Shv3cMnnbrvh2bsRt7">
+                            <input type="hidden" name="submit_type" value="login_email" />
+                            
+                                
+    <div class="mb-3 d-md-flex">
+        
+            <label class="col-md-5 pe-4 form-label" for="id_email">
+    Email
+</label>
+
+            <div class="col-md-7">
+    <input class="form-control" type="email" name="email" autofocus maxlength="254" required id="id_email" />
+    
+
+    
+</div>
+
+        
+    </div>
+
+
+                            
+                                
+    <div class="mb-3 d-md-flex">
+        
+            <label class="col-md-5 pe-4 form-label" for="id_password">
+    Password
+</label>
+
+            <div class="col-md-7">
+    <input class="form-control" type="password" name="password" required id="id_password" />
+    
+
+    
+</div>
+
+        
+    </div>
+
+
+                            
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary login-button">Login</button>
+                            </div>
+                        </form>
+                    
+                </div>
+            </div>
+            <div class="card border-dark">
+                <form id="request-login-form" class="card-body d-flex flex-column"
+                    action="/?next=/contributor/evaluation/32/edit" method="POST">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="ouMFQdhSNIyRGQMtWKR6IQAkJpNs4rz5uy2xgsJfwgpjP9Shv3cMnnbrvh2bsRt7">
+                    <input type="hidden" name="submit_type" value="new_key" />
+                    <h4 class="card-title text-dark">
+                        D-School, E-School and externals
+                    </h4>
+                    <p class="card-text mb-lg-auto">
+                        Here you can request a one-time login URL. We will send it to your email address.
+                    </p>
+                    
+    <div class="mb-3 d-md-flex">
+        
+            <label class="col-md-5 pe-4 form-label" for="id_email">
+    Email address
+</label>
+
+            <div class="col-md-7">
+    <input class="form-control" type="email" name="email" maxlength="320" required id="id_email" />
+    
+
+    
+</div>
+
+        
+    </div>
+
+
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-dark login-button">Request login URL</button>
+                        <button type="button" class="btn btn-light ms-1" data-bs-toggle="modal" data-bs-target="#loginProblemsModal">
+                            Help
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+            </div>
+        </div>
+
+        <div class="footer d-print-none">
+    <div class="color-bar">
+        <div class="vote-bg-green width-percent-52"></div>
+        <div class="vote-bg-lime width-percent-26"></div>
+        <div class="vote-bg-yellow width-percent-13"></div>
+        <div class="vote-bg-orange width-percent-6"></div>
+        <div class="vote-bg-red width-percent-3"></div>
+    </div>
+    <nav class="navbar navbar-expand">
+        <div class="collapse navbar-collapse justify-content-between">
+            <ul class="navbar-nav justify-content-start">
+                <li class="nav-item my-auto">
+                    <a class="nav-link nav-link-multiline" href="/legal_notice">Legal Notice<br />Data Privacy</a>
+                </li>
+                <li class="d-none d-sm-block nav-item">
+                    <a class="nav-link" href="https://github.com/e-valuation/EvaP" target="_blank"><span class="fas fa-arrow-up-right-from-square"></span> GitHub project</a>
+                </li>
+            </ul>
+            <div class="d-none d-lg-block navbar-nav justify-content-center text-center">
+                <span class="fst-italic">Enhances vibrant academic programs</span>
+            </div>
+            <div class="navbar-nav justify-content-end feedback-button-placeholder">
+                
+            </div>
+        </div>
+    </nav>
+</div>
+
+
+        <script src="/catalog.js"></script>
+
+        <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
+        <script type="text/javascript" src="/static/js/tom-select.complete.min.js"></script>
+        <script type="text/javascript" src="/static/js/plugins/jquery.formset.js"></script>
+        <script type="text/javascript" src="/static/js/Sortable.min.js"></script>
+
+        <script type="module" src="/static/js/csrf-utils.js"></script>
+        <script type="module" src="/static/js/utils.js"></script>
+
+        <script type="module" src="/static/js/base-template.js"></script>
+        <script type="text/javascript">
+            activateTooltips = function(selector = "") {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll(selector + \' [data-bs-toggle="tooltip"]\'))
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    var container = \'body\';
+                    if (tooltipTriggerEl.dataset.container){
+                        container = tooltipTriggerEl.closest(tooltipTriggerEl.dataset.container);
+                    }
+                    return new bootstrap.Tooltip(tooltipTriggerEl, {container: container, html: true, trigger: \'hover\'})
+                })
+
+            };
+            activateTooltips();
+
+            // These are workarounds around incompatibilities of django, django-dynamic-formsets, and tomselect.
+            // tomselect can\'t handle already tomselect\'d forms that were copies made by django-dynamic-formsets\'
+            // "add another" button, so we take a copy of a non-tomselect\'d form here
+            const tomSelectRows = document.querySelectorAll(".tomselecttr");
+
+            if(tomSelectRows.length != 0) {
+                const templateForm = tomSelectRows[tomSelectRows.length - 1].cloneNode(true);
+
+                // later we use this class to give this to django-dynamic-formsets as template and to make sure it does not get tomselect\'d
+                templateForm.classList.add("form-template");
+                templateForm.style.display = "none";
+
+                // django-dynamic-formsets doesn\'t hide the "delete this row" input in the clone since it\'s not part of the formset.
+                templateForm.querySelectorAll("input[id$=-DELETE]").forEach(input => {input.type = "hidden";});
+
+                // For some reason, django validates this template if it\'s part of the form, so we insert the copy outside of the form.
+                document.querySelector(".tomselectform").insertAdjacentElement("afterend", templateForm);
+            }
+
+            // used in derived templates. Tag inputs are multi-inputs where users can add options
+            const tagTomSelectOptions = {
+                create: true,
+                createOnBlur: true,
+                delimiter: \'\', // we don\'t want the default "comma creates entry" behavior
+
+                dropdownParent: document.createElement("div"),  // To make it invisible
+                // On enter, with hidden dropdown, always add current text. Otherwise, adding a
+                // prefix of an existing item doesn\'t work
+                addPrecedence: true,
+            };
+
+            class MinimumInputLengthTomSelect extends TomSelect {
+                constructor(...args) {
+                    super(...args);
+                    this.settings.shouldLoad = () => true;  // Otherwise, for empty inputs, no dropdown would be shown.
+                }
+                // hacky solution, comes from
+                // https://github.com/orchidjs/tom-select/discussions/376
+                // ( via https://stackoverflow.com/questions/72233401/ )
+                search(query) {
+                    if(query.length < this.settings.minimumInputLength) {
+                        return this.sifter.prepareSearch(query, {});
+                    }
+                    return super.search(query);
+                }
+            }
+
+            applyTomSelect = function(elements, additionalOptions = {}) {
+                elements.forEach((element) => {
+                    const minimumInputLength = element.options.length >= 50 ? 3 : 0;
+
+                    element.tomselect?.destroy();
+                    element.classList.remove("form-select");  // TomSelect applies their own matching classes / styles
+                    if(element.parentElement.classList.contains("is-invalid")) {  // hotfix for our wrongly placed is-invalid
+                        element.parentElement.classList.remove("is-invalid");
+                        element.classList.add("is-invalid");
+                    }
+                    const baseOptions = {
+                        createOnBlur: true,
+                        placeholder: "Please select...",
+                        hidePlaceholder: element.hasAttribute("data-tomselect-fullwidth") ? false : true,
+                        minimumInputLength,
+                        render: {
+                            option_create: (data, escape) => `<div class="create">${ escape(data.input) }</div>`,
+                            no_results: (data, escape) => {
+                                if(data.input.length < minimumInputLength) {
+                                    return `<div class="no-results">Please enter ${ minimumInputLength } characters or more...</div>`;
+                                } else {
+                                    return \'<div class="no-results">No results found</div>\';
+                                }
+                            }
+                        },
+                        closeAfterSelect: true, // also clears search input on enter.
+                        plugins: {},
+                        hideSelected: false,
+                    };
+                    if (element.hasAttribute("tomselect-no-sort")) {
+                        baseOptions.sortField = [{field:\'$order\'},{field:\'$score\'}];
+                    }
+                    if(element.hasAttribute("data-tomselect-fullwidth")) {
+                        // span needed to the "remove this icon" button is right-aligned
+                        baseOptions.render.item = (data, escape) => `<div class="w-100"><span class="w-100">${ escape(data.text) }</span></div>`;
+                    }
+                    if(element.multiple) {
+                        baseOptions.plugins.clear_button = {"title": "Remove all items"};
+                        baseOptions.plugins.remove_button = {"title": "Remove this item"};
+                    }
+                    new MinimumInputLengthTomSelect(element, Object.assign({}, baseOptions, additionalOptions));
+                });
+            };
+            applyTomSelect(document.querySelectorAll("select:not(.form-template select):not(.no-tomselect)"));
+
+            document.addEventListener(\'change\', e => e.target.classList.remove("invalid"), true);
+
+            // activate clickable hover tables
+            document.querySelectorAll(".table-seamless-links [data-url]").forEach(row => {
+                row.addEventListener("click", event => {
+                    // We navigate via the <a> tag to enable browser behavior for Ctrl-Click. We cannot insert an actual
+                    // <a> tag, because there cannot be any non-table tags between for example <tbody> and <tr>.
+                    const anchor = document.createElement("a");
+                    anchor.href = row.dataset.url;
+                    // As `event` is bound to `row`, we need to clone it.
+                    anchor.dispatchEvent(new event.constructor(event.type, event));
+                });
+            });
+
+            document.querySelectorAll(".hover-row").forEach(row => {
+                row.querySelectorAll(".btn:not(.btn-row-hover)").forEach(button => {
+                    button.addEventListener("mouseover", () => row.classList.remove("hover-row"));
+                    button.addEventListener("mouseout", () => row.classList.add("hover-row"));
+                });
+            });
+
+            function setSpinnerIcon(id) {
+                const element = document.getElementById(id);
+                element.innerHTML = "";
+                element.className = "fas fa-spinner fa-spin";  // clears all other classes
+            };
+
+            document.querySelectorAll("[data-set-spinner-icon]").forEach(el => {
+                el.addEventListener("click", () => setSpinnerIcon(el.dataset.setSpinnerIcon));
+            });
+        </script>
+
+        <script type="module">
+            import { setupForms } from "/static/js/custom-success-form.js";
+
+            setupForms();
+        </script>
+
+        
+    </body>
+</html>
