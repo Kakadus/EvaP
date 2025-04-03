@@ -214,15 +214,15 @@ class Questionnaire(models.Model):
     def __str__(self):
         return self.name
 
-    def clean(self):
-        if self.type == self.Type.CONTRIBUTOR and self.is_locked:
-            raise ValidationError({"is_locked": _("Contributor questionnaires cannot be locked.")})
-
     def __lt__(self, other):
         return (self.type, self.order, self.pk) < (other.type, other.order, other.pk)
 
     def __gt__(self, other):
         return (self.type, self.order, self.pk) > (other.type, other.order, other.pk)
+
+    def clean(self):
+        if self.type == self.Type.CONTRIBUTOR and self.is_locked:
+            raise ValidationError({"is_locked": _("Contributor questionnaires cannot be locked.")})
 
     @property
     def is_above_contributors(self):
