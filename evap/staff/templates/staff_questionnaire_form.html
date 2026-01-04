@@ -1,6 +1,7 @@
 {% extends 'staff_questionnaire_base.html' %}
 
 {% load static %}
+{% load questionnaire_templatetags %}
 
 {% block content %}
     {{ block.super }}
@@ -88,23 +89,63 @@
     {% if editable %}
         <script type="module">
             import { makeFormSortable } from "{% static 'js/sortable-form.js' %}";
+
+            const createdTextEntry = function(input) {
+                return { value: JSON.stringify({'value': input}), text: input };
+            };
+
+            const lookupQuestion = async function(e) {
+                const row = e.target.closest("tr");
+
+                const type = row.querySelector("select[id$=-type]");
+                const allowTextanswer = row.querySelector("input[type=checkbox].allow-textanswer-checkbox");
+                const tooltip = bootstrap.Tooltip.getOrCreateInstance(type.closest("td.question-type"), { title: "{% translate 'Cannot edit question because it is in use in another questionnaire.' %}" });
+                const question_id = row.querySelector("input[id$=-question]");
+                console.log(e.target.value)
+                const value = e.target.value || "{}";
+                const data = JSON.parse(value);
+                if (Object.keys(data).length <= 1) {
+                    type.tomselect.enable();
+                    allowTextanswer.disabled = false;
+                    question_id.value = "";
+                    tooltip.disable();
+                    return;
+                }
+
+                for (let key of ["text_de", "text_en"]) {
+                    const select = row.querySelector(`select[id$=-${key}]`);
+                    select.tomselect.setValue(value, true);
+                }
+
+                question_id.value = data["id"];
+
+                allowTextanswer.checked = data["allows_additional_textanswers"];
+                allowTextanswer.disabled = true;
+
+                type.tomselect.setValue(data["type"], true);
+                type.tomselect.disable();
+                tooltip.enable();
+            };
+
             const rowChanged = function(row) {
-                const nameDe = row.querySelector('textarea[id$=-text_de]')?.value;
-                const nameEn = row.querySelector('textarea[id$=-text_en]')?.value;
+                const nameDe = row.querySelector("select[id$=-text_de]")?.value;
+                const nameEn = row.querySelector("select[id$=-text_en]")?.value;
                 return nameDe || nameEn;
             };
             const rowAdded = function(row) {
-                row.querySelectorAll('a.btn-secondary').forEach(el => {
+                row.querySelectorAll("a.btn-secondary").forEach(el => {
                     el.remove();
                 });
-                applyTomSelect(row.querySelectorAll("select"));
+                applyTomSelect(row.querySelectorAll("select[id$=-type]"));
+                applyTextTomSelect(row);
                 registerSelectChangedHandlers();
             };
-            makeFormSortable("question_table", "questions", rowChanged, rowAdded, true, true);
+            makeFormSortable("question_table", "question_assignments", rowChanged, rowAdded, true, true);
+            applyTomSelect(document.querySelectorAll("form select[id*=-text_]"), { create: createdTextEntry });
 
             const selectChangedHandler = function(e) {
                 const checkbox = this.closest("td.question-type").querySelector("input[type=checkbox]");
-                if (e.currentTarget.value == 0 || e.currentTarget.value == 5) {  // 0: Text question; 5: Heading
+                if (e.currentTarget.value === "0" || e.currentTarget.value === "5") {  // 0: Text question; 5: Heading
                     checkbox.checked = false;
                     checkbox.disabled = true;
                 } else {
@@ -114,10 +155,19 @@
 
             const registerSelectChangedHandlers = function() {
                 document.querySelectorAll(".question-type select").forEach(selectElement => {
-                    selectElement.addEventListener('change', selectChangedHandler);
+                    selectElement.addEventListener("change", selectChangedHandler);
+                });
+                document.querySelectorAll("select[id*='-text_']").forEach(select => {
+                    select.addEventListener("change", lookupQuestion);
                 });
             };
             registerSelectChangedHandlers();
+
+            const applyTextTomSelect = function(row) {
+                applyTomSelect(row.querySelectorAll("form select[id*=-text_de]"), { create: createdTextEntry, maxOptions: 20, options: {% load_question_text_options "de" %} });
+                applyTomSelect(row.querySelectorAll("form select[id*=-text_en]"), { create: createdTextEntry, maxOptions: 20, options: {% load_question_text_options "en" %} });
+            }
+            applyTextTomSelect(document);
         </script>
     {% endif %}
 {% endblock %}

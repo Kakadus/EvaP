@@ -3315,8 +3315,8 @@ class TestQuestionnaireEditView(WebTestStaffModeWith200Check):
 
         page = self.app.get(self.url, user=self.manager)
         form = page.forms["questionnaire-form"]
-        form["question_assignments-0-text_de"].force_value("successfully")
-        form["question_assignments-0-text_en"].force_value("changed")
+        form["question_assignments-0-text_de"].force_value('{"value":"successfully"}')
+        form["question_assignments-0-text_en"].force_value('{"value":"changed"}')
         form["question_assignments-0-type"] = QuestionType.NEGATIVE_LIKERT
         form["question_assignments-0-allows_additional_textanswers"] = True
         return form.submit()
@@ -3331,13 +3331,12 @@ class TestQuestionnaireEditView(WebTestStaffModeWith200Check):
         self.assertEqual(question.type, QuestionType.NEGATIVE_LIKERT)
         self.assertEqual(question.allows_additional_textanswers, True)
 
-    def test_copy_on_write_used_question(self) -> None:
+    def test_cannot_change_used_questions(self) -> None:
         question = self.questionnaire.questions.get()
         baker.make(QuestionAssignment, question=question)
 
-        self.change_question().follow()
-
-        self.assertNotEqual(question, self.questionnaire.questions.get())
+        page = self.change_question()
+        self.assertIn("cannot change a question that is used in multiple questionnaires.", page)
 
 
 class TestQuestionnaireViewView(WebTestStaffModeWith200Check):

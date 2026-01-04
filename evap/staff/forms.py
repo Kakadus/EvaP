@@ -1,3 +1,4 @@
+import json
 import logging
 from collections.abc import Iterable
 
@@ -902,22 +903,50 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ("text_de", "text_en", "type", "allows_additional_textanswers")
-        widgets = {
-            "text_de": forms.Textarea(attrs={"rows": 2}),
-            "text_en": forms.Textarea(attrs={"rows": 2}),
-        }
+        widgets = {"text_de": forms.Select, "text_en": forms.Select}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.pk and self.instance.type in [QuestionType.TEXT, QuestionType.HEADING] and not self.data:
-            self.fields["allows_additional_textanswers"].disabled = True
+
+        if self.instance.pk:
+            instance_values = json.dumps({k: getattr(self.instance, k) for k in ["id", *self.Meta.fields]})
+            for field in ["text_de", "text_en"]:
+                self.initial[field] = instance_values
+                self.fields[field].widget.choices = [(instance_values, getattr(self.instance, field))]
+
+            if self.instance.questionnaires.count() > 1:
+                for field in ["type", "allows_additional_textanswers"]:
+                    self.fields[field].disabled = True
+            elif self.instance.type in [QuestionType.TEXT, QuestionType.HEADING] and not self.data:
+                self.fields["allows_additional_textanswers"].disabled = True
+
+    def text_clean_helper(self, text_field: str) -> str:
+        data = self.cleaned_data[text_field]
+        if not data:
+            return data
+        try:
+            parsed = json.loads(data)
+        except json.JSONDecodeError as err:
+            raise ValidationError(_("Invalid JSON data.")) from err
+        if not isinstance(parsed, dict):
+            raise ValidationError(_("Invalid JSON data."))
+        value = parsed.get("value") or parsed.get(text_field) or ""
+        if not isinstance(value, str):
+            raise ValidationError(_("Invalid JSON data."))
+        return value
+
+    def clean_text_de(self) -> str:
+        return self.text_clean_helper("text_de")
+
+    def clean_text_en(self) -> str:
+        return self.text_clean_helper("text_en")
 
     def clean(self):
         super().clean()
         if self.cleaned_data.get("type") in [QuestionType.TEXT, QuestionType.HEADING]:
             self.cleaned_data["allows_additional_textanswers"] = False
-        if self.instance.pk and self.instance.questionnaires.count() > 1 and self.has_changed():
-            self.instance.pk = None  # copy on write
+        if self.instance.pk and self.instance.questionnaires.count() > 1:
+            raise ValidationError(_("You cannot change a question that is used in multiple questionnaires."))
         return self.cleaned_data
 
 
